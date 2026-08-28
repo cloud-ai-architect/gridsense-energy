@@ -8,7 +8,10 @@ terraform {
 
 variable "bucket_name" { type = string }
 variable "index_name" { type = string }
-variable "embedding_dim" { type = number; default = 1024 }
+variable "embedding_dim" {
+  type = number
+  default = 1024
+}
 variable "common_tags" { type = map(string); default = {} }
 variable "vectors_role_arn" { type = string }
 

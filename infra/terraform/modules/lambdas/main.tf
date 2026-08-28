@@ -11,9 +11,18 @@ variable "project_name" { type = string }
 variable "environment" { type = string }
 variable "name_prefix" { type = string }
 variable "lambdas" { type = map(string) }
-variable "lambda_runtime" { type = string; default = "python3.12" }
-variable "lambda_memory_mb" { type = number; default = 512 }
-variable "lambda_timeout" { type = number; default = 300 }
+variable "lambda_runtime" {
+  type = string
+  default = "python3.12"
+}
+variable "lambda_memory_mb" {
+  type = number
+  default = 512
+}
+variable "lambda_timeout" {
+  type = number
+  default = 300
+}
 variable "buckets" { type = map(string) }
 variable "tables" { type = map(string) }
 variable "vector_index_name" { type = string }
@@ -21,7 +30,10 @@ variable "bedrock_model_id" { type = string }
 variable "haiku_model_id" { type = string }
 variable "lambda_role_arns" { type = map(string) }
 variable "api_role_arns" { type = map(string) }
-variable "log_retention_days" { type = number; default = 30 }
+variable "log_retention_days" {
+  type = number
+  default = 30
+}
 variable "common_tags" { type = map(string); default = {} }
 
 locals {

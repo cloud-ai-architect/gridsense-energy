@@ -14,9 +14,18 @@ resource "aws_dynamodb_table" "this" {
   hash_key     = "order_id"
   tags         = var.common_tags
 
-  attribute { name = "order_id"; type = "S" }
-  attribute { name = "customer_id"; type = "S" }
-  attribute { name = "created_at"; type = "S" }
+  attribute {
+    name = "order_id"
+    type = "S"
+  }
+  attribute {
+    name = "customer_id"
+    type = "S"
+  }
+  attribute {
+    name = "created_at"
+    type = "S"
+  }
 
   global_secondary_index {
     name            = "customer-index"

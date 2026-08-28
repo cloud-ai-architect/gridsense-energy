@@ -8,7 +8,10 @@ terraform {
 variable "name_prefix" { type = string }
 variable "ui_bucket" { type = string }
 variable "api_url" { type = string }
-variable "enabled" { type = bool; default = true }
+variable "enabled" {
+  type = bool
+  default = true
+}
 variable "common_tags" { type = map(string); default = {} }
 
 resource "aws_cloudfront_origin_access_control" "this" {
