@@ -1,0 +1,16 @@
+aws_region                  = "ap-south-1"
+environment                 = "prod"
+project_name                = "retailpulse"
+owner                       = "vijay"
+cost_center                = "portfolio"
+github_org                  = "cloud-ai-architect"
+github_repo                 = "retailpulse-cx-agent"
+bedrock_model_id            = "anthropic.claude-sonnet-4-5-20250929-v1:0"
+bedrock_haiku_model_id      = "anthropic.claude-haiku-4-5-20250929-v1:0"
+embedding_dimensions        = 1024
+lambda_runtime              = "python3.12"
+lambda_memory_mb            = 1024
+lambda_timeout_seconds      = 600
+enable_cloudfront           = true
+log_retention_days          = 90
+monthly_budget_usd          = 200
