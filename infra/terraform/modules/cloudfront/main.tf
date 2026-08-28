@@ -12,7 +12,10 @@ variable "enabled" {
   type = bool
   default = true
 }
-variable "common_tags" { type = map(string); default = {} }
+variable "common_tags" {
+  type = map(string)
+  default = {}
+}
 
 resource "aws_cloudfront_origin_access_control" "this" {
   name                              = "${var.name_prefix}-oac"

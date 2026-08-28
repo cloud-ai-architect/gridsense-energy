@@ -6,7 +6,10 @@ terraform {
 }
 
 variable "table_name" { type = string }
-variable "common_tags" { type = map(string); default = {} }
+variable "common_tags" {
+  type = map(string)
+  default = {}
+}
 
 resource "aws_dynamodb_table" "this" {
   name         = var.table_name

@@ -8,7 +8,10 @@ terraform {
 variable "name_prefix" { type = string }
 variable "state_machine_arn" { type = string }
 variable "lambda_arns" { type = map(string) }
-variable "common_tags" { type = map(string); default = {} }
+variable "common_tags" {
+  type = map(string)
+  default = {}
+}
 
 locals {
   asl_definition = jsonencode({

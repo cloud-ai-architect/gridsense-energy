@@ -8,7 +8,10 @@ terraform {
 variable "name_prefix" { type = string }
 variable "bucket_name" { type = string }
 variable "state_machine_arn" { type = string }
-variable "common_tags" { type = map(string); default = {} }
+variable "common_tags" {
+  type = map(string)
+  default = {}
+}
 
 data "aws_iam_policy_document" "eb_assume" {
   statement {

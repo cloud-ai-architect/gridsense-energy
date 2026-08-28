@@ -8,7 +8,10 @@ terraform {
 variable "name_prefix" { type = string }
 variable "search_lambda" { type = string }
 variable "feedback_lambda" { type = string }
-variable "common_tags" { type = map(string); default = {} }
+variable "common_tags" {
+  type = map(string)
+  default = {}
+}
 
 resource "aws_apigatewayv2_api" "this" {
   name          = "${var.name_prefix}-api"

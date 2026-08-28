@@ -12,7 +12,10 @@ variable "embedding_dim" {
   type = number
   default = 1024
 }
-variable "common_tags" { type = map(string); default = {} }
+variable "common_tags" {
+  type = map(string)
+  default = {}
+}
 variable "vectors_role_arn" { type = string }
 
 resource "aws_kms_key" "this" {

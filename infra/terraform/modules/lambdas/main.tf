@@ -34,7 +34,10 @@ variable "log_retention_days" {
   type = number
   default = 30
 }
-variable "common_tags" { type = map(string); default = {} }
+variable "common_tags" {
+  type = map(string)
+  default = {}
+}
 
 locals {
   common_env = {

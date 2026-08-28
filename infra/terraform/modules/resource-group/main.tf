@@ -7,7 +7,10 @@ terraform {
 
 variable "name_prefix" { type = string }
 variable "environment" { type = string }
-variable "common_tags" { type = map(string); default = {} }
+variable "common_tags" {
+  type = map(string)
+  default = {}
+}
 
 resource "aws_resourcegroups_group" "this" {
   name        = "rg-${var.name_prefix}"
