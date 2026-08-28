@@ -5,19 +5,21 @@ terraform {
   }
 }
 
-variable "oidc_url" { type = string }
-variable "client_id" { type = string }
-variable "thumbprint" { type = string }
-variable "common_tags" {
-  type    = map(string)
-  default = {}
+variable "arn" {
+  description = "ARN of the GitHub OIDC provider (read-only, already exists)"
+  type        = string
 }
 
 data "aws_iam_openid_connect_provider" "github" {
-  url             = var.oidc_url
-  client_id_list  = [var.client_id]
-  thumbprint_list = [var.thumbprint]
-  tags            = var.common_tags
+  arn = var.arn
 }
 
-output "provider_arn" { value = data.aws_iam_openid_connect_provider.github.arn }
+output "provider_arn" {
+  description = "ARN of the GitHub OIDC provider"
+  value       = data.aws_iam_openid_connect_provider.github.arn
+}
+
+output "thumbprint_list" {
+  description = "Thumbprint list of the GitHub OIDC provider"
+  value       = data.aws_iam_openid_connect_provider.github.thumbprint_list
+}
