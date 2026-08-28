@@ -1,0 +1,8 @@
+/* GridSense UI */
+:root { --bg: #0d1117; --bg-elev: #161b22; --fg: #e6edf3; --fg-muted: #7d8590; --accent: #58a6ff; --border: #30363d; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--fg); padding: 24px; }
+header h1 { font-size: 22px; margin: 0 0 16px 0; }
+main { max-width: 1200px; margin: 0 auto; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }

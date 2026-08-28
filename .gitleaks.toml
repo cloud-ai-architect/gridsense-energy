@@ -1,0 +1,21 @@
+title = "GridSense secret-scan"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "aws-access-token-id"
+description = "AWS Access Key"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+tags = ["aws", "secret"]
+
+[allowlist]
+regexes = [
+  '''<ACCOUNT_ID>''',
+  '''\$\{aws_account_id\}''',
+  '''\$\{var\.aws_account_id\}''',
+]
+
+[report]
+format = "json"
+exit-code = 1
