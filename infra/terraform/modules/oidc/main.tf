@@ -13,11 +13,11 @@ variable "common_tags" {
   default = {}
 }
 
-resource "aws_iam_openid_connect_provider" "github" {
+data "aws_iam_openid_connect_provider" "github" {
   url             = var.oidc_url
   client_id_list  = [var.client_id]
   thumbprint_list = [var.thumbprint]
   tags            = var.common_tags
 }
 
-output "provider_arn" { value = aws_iam_openid_connect_provider.github.arn }
+output "provider_arn" { value = data.aws_iam_openid_connect_provider.github.arn }

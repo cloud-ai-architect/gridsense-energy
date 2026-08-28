@@ -49,6 +49,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
   rule {
     id     = "expire-old-ingests"
+    filter { prefix = "" }
     status = "Enabled"
     expiration { days = 30 }
     noncurrent_version_expiration { noncurrent_days = 7 }
