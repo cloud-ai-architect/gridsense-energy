@@ -1,4 +1,4 @@
-###############################################################################
+﻿###############################################################################
 # Input variables. All account-specific values come from envs/<env>.tfvars.
 ###############################################################################
 
@@ -45,7 +45,7 @@ variable "github_org" {
 variable "github_repo" {
   description = "GitHub repository name"
   type        = string
-  default     = "retailpulse-cx-agent"
+  default     = "gridsense-energy"
 }
 
 variable "bedrock_model_id" {

@@ -1,6 +1,6 @@
-aws_region                  = "ap-south-1"
+﻿aws_region                  = "ap-south-1"
 environment                 = "dev"
-project_name                = "retailpulse"
+project_name = "gridsense-energy"
 owner                       = "vijay"
 cost_center                = "portfolio"
 github_org                  = "cloud-ai-architect"
