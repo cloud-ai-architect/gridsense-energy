@@ -60,7 +60,7 @@ class ExplainAgent(BaseAgent):
     ) -> dict[str, Any]:
         import json
 
-        parts = ["Series summary (computed):\n%s" % json.dumps(summary, indent=1)]
+        parts = [f"Series summary (computed):\n{json.dumps(summary, indent=1)}"]
         if forecast:
             trimmed = dict(forecast)
             # The operator does not need 48 numbers in the prompt; the shape
@@ -68,11 +68,11 @@ class ExplainAgent(BaseAgent):
             vals = trimmed.get("values") or []
             if len(vals) > 12:
                 trimmed["values"] = vals[:6] + ["..."] + vals[-6:]
-            parts.append("Forecast (computed):\n%s" % json.dumps(trimmed, indent=1))
+            parts.append(f"Forecast (computed):\n{json.dumps(trimmed, indent=1)}")
         if anomalies:
             parts.append(
-                "Anomalies (computed, %d total, first 5):\n%s"
-                % (len(anomalies), json.dumps(anomalies[:5], indent=1))
+                f"Anomalies (computed, {len(anomalies)} total, first 5):\n"
+                f"{json.dumps(anomalies[:5], indent=1)}"
             )
         result = self.invoke_json("\n\n".join(parts), max_tokens=2500)
         result["disclaimer"] = DISCLAIMER
@@ -113,10 +113,9 @@ class DispatchAgent(BaseAgent):
         import json
 
         parts = [
-            "Firm capacity: %s MW" % capacity_mw,
-            "Forecast (computed):\n%s" % json.dumps(forecast, indent=1)[:2500],
-            "Available demand-response resources:\n%s"
-            % json.dumps(resources or [], indent=1),
+            f"Firm capacity: {capacity_mw} MW",
+            f"Forecast (computed):\n{json.dumps(forecast, indent=1)[:2500]}",
+            f"Available demand-response resources:\n{json.dumps(resources or [], indent=1)}",
         ]
         result = self.invoke_json("\n\n".join(parts), max_tokens=2500)
         result["disclaimer"] = DISCLAIMER
@@ -142,7 +141,7 @@ class OrchestratorAgent(BaseAgent):
     VALID = {"forecast", "anomaly", "dispatch", "explain"}
 
     def handle(self, request: str) -> dict[str, Any]:
-        result = self.invoke_json("Request:\n%s" % request)
+        result = self.invoke_json(f"Request:\n{request}")
         if result.get("agent") not in self.VALID:
             # Forecast is the safe default: it needs only a series, which is
             # the one input every request here carries.

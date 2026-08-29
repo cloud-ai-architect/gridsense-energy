@@ -8,19 +8,21 @@ here so a bug is fixed in one place.
 from __future__ import annotations
 
 import json
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from src.common import GridSenseError
 
 
-def parse_event(event: dict) -> dict:
+def parse_event(event: dict[str, Any]) -> dict[str, Any]:
     """Return the request body from a direct, API Gateway, or Step Function event."""
     if not isinstance(event, dict):
         return {}
     body = event.get("body")
     if isinstance(body, str):
         try:
-            return json.loads(body)
+            loaded: dict[str, Any] = json.loads(body)
+            return loaded
         except json.JSONDecodeError:
             return {}
     if isinstance(body, dict):
@@ -38,7 +40,9 @@ def respond(status: int, payload: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def run_stage(event: dict, required: list[str], fn: Callable[[dict], Any]) -> dict[str, Any]:
+def run_stage(
+    event: dict[str, Any], required: list[str], fn: Callable[[dict[str, Any]], Any]
+) -> dict[str, Any]:
     """Validate inputs, run the agent, and map failures to HTTP responses."""
     data = parse_event(event)
 
@@ -48,7 +52,7 @@ def run_stage(event: dict, required: list[str], fn: Callable[[dict], Any]) -> di
             400,
             {
                 "error": "MISSING_PARAMETERS",
-                "message": "required: %s" % ", ".join(missing),
+                "message": "required: {}".format(", ".join(missing)),
             },
         )
 

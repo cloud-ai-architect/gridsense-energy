@@ -31,8 +31,9 @@ def build(weeks=3, drift=0.01, spike_at=None, noise=3.0, seed=11):
     for i in range(p * 7 * weeks):
         tod = 2 * math.pi * (i % p) / p
         weekend = -25 if (i // p) % 7 in (5, 6) else 0
-        out.append(240 + 70 * math.sin(tod - math.pi / 2) + weekend
-                   + i * drift + random.gauss(0, noise))
+        out.append(
+            240 + 70 * math.sin(tod - math.pi / 2) + weekend + i * drift + random.gauss(0, noise)
+        )
     if spike_at is not None:
         out[spike_at] += 190
     return out
@@ -90,7 +91,7 @@ class TestAnomalyDetection:
         for weeks in (3, 4, 6):
             s = build(weeks=weeks, spike_at=500)
             found = detect_anomalies(s)
-            assert len(found) / len(s) < 0.01, "%d weeks" % weeks
+            assert len(found) / len(s) < 0.01, f"{weeks} weeks"
 
     def test_no_phantom_one_period_from_a_spike(self):
         """Regression: a mean-based profile let one spike inflate the

@@ -109,7 +109,9 @@ class BaseAgent:
             raise ModelError(f"{self.NAME}: model call failed ({model_id}): {exc}") from exc
 
         try:
-            text = response["output"]["message"]["content"][0]["text"]
+            # The Converse response is untyped; assert the shape we rely on
+            # rather than returning Any from a function declared to return str.
+            text = str(response["output"]["message"]["content"][0]["text"])
         except (KeyError, IndexError) as exc:
             raise ModelError(f"{self.NAME}: unexpected response shape from {model_id}") from exc
 
@@ -135,9 +137,10 @@ class BaseAgent:
         if start == -1 or end == -1 or end < start:
             raise ModelError(f"{self.NAME}: no JSON object in model reply: {raw[:200]}")
         try:
-            return json.loads(raw[start : end + 1])
+            parsed: dict[str, Any] = json.loads(raw[start : end + 1])
         except json.JSONDecodeError as exc:
             raise ModelError(f"{self.NAME}: malformed JSON from model: {exc}") from exc
+        return parsed
 
     def run(self, *args: Any, **kwargs: Any) -> Any:
         self.ensure_setup()

@@ -9,10 +9,11 @@ from __future__ import annotations
 import os
 import time
 import uuid
+from typing import Any
 
 import boto3
 
-from src.lambdas._base import respond, run_stage
+from src.lambdas._base import run_stage
 
 TABLE = os.environ.get("FEEDBACK_TABLE", "")
 REGION = os.environ.get("AWS_REGION", "ap-south-1")
@@ -20,10 +21,10 @@ REGION = os.environ.get("AWS_REGION", "ap-south-1")
 VERDICTS = {"accepted", "edited", "rejected"}
 
 
-def _record(data: dict) -> dict:
+def _record(data: dict[str, Any]) -> dict[str, Any]:
     verdict = str(data["verdict"]).lower()
     if verdict not in VERDICTS:
-        raise ValueError("verdict must be one of: %s" % ", ".join(sorted(VERDICTS)))
+        raise ValueError("verdict must be one of: {}".format(", ".join(sorted(VERDICTS))))
 
     item = {
         "feedback_id": {"S": str(uuid.uuid4())},
@@ -41,5 +42,5 @@ def _record(data: dict) -> dict:
     return {"feedback_id": item["feedback_id"]["S"], "recorded": bool(TABLE)}
 
 
-def handler(event: dict, context: object) -> dict:
+def handler(event: dict[str, Any], context: object) -> dict[str, Any]:
     return run_stage(event, required=["task_id", "verdict"], fn=_record)

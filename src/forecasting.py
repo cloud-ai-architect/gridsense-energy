@@ -113,8 +113,7 @@ def _validate(series: list[float], period: int) -> list[str]:
     warnings: list[str] = []
     if len(series) < period:
         raise ForecastError(
-            "need at least one full period of history (%d readings), got %d"
-            % (period, len(series))
+            f"need at least one full period of history ({period} readings), got {len(series)}"
         )
     if len(series) < period * 2:
         warnings.append(
@@ -165,17 +164,10 @@ def _seasonal_profile(series: list[float], period: int, trend: float = 0.0) -> l
     # Day-of-week offset, pooled across every reading in that weekday.
     dow = []
     for d in range(days_in_cycle):
-        samples = [
-            v
-            for i, v in enumerate(work)
-            if (i // day) % days_in_cycle == d
-        ]
+        samples = [v for i, v in enumerate(work) if (i // day) % days_in_cycle == d]
         dow.append(statistics.median(samples) - centre if samples else 0.0)
 
-    return [
-        daily[pos % day] + dow[(pos // day) % days_in_cycle]
-        for pos in range(period)
-    ]
+    return [daily[pos % day] + dow[(pos // day) % days_in_cycle] for pos in range(period)]
 
 
 def _trend(series: list[float], period: int) -> float:
@@ -187,10 +179,7 @@ def _trend(series: list[float], period: int) -> float:
     if len(series) < period * 2:
         return 0.0
     complete = len(series) // period
-    means = [
-        statistics.fmean(series[i * period : (i + 1) * period])
-        for i in range(complete)
-    ]
+    means = [statistics.fmean(series[i * period : (i + 1) * period]) for i in range(complete)]
     if len(means) < 2:
         return 0.0
     return (means[-1] - means[0]) / ((len(means) - 1) * period)
@@ -213,10 +202,7 @@ def forecast(
     # so a step change is picked up rather than averaged away.
     level = statistics.fmean(series[-period:])
 
-    values = [
-        level + trend * (h + 1) + profile[(len(series) + h) % period]
-        for h in range(horizon)
-    ]
+    values = [level + trend * (h + 1) + profile[(len(series) + h) % period] for h in range(horizon)]
 
     return Forecast(
         horizon=horizon,
@@ -243,7 +229,7 @@ def detect_anomalies(
     # Expectation carries the trend back in, so residuals measure departure
     # from the seasonal shape rather than from a drifting baseline.
     expected = [centre + trend * i + profile[i % period] for i in range(len(series))]
-    residuals = [a - e for a, e in zip(series, expected)]
+    residuals = [a - e for a, e in zip(series, expected, strict=False)]
 
     median = statistics.median(residuals)
     mad = statistics.median([abs(r - median) for r in residuals])

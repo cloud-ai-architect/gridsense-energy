@@ -5,6 +5,8 @@ Pure computation: no model call.
 
 from __future__ import annotations
 
+from typing import Any
+
 from src.forecasting import (
     DEFAULT_PERIOD,
     DEFAULT_THRESHOLD,
@@ -15,7 +17,7 @@ from src.forecasting import (
 from src.lambdas._base import respond, run_stage
 
 
-def _run(data: dict) -> dict:
+def _run(data: dict[str, Any]) -> dict[str, Any]:
     series = [float(v) for v in data["series"]]
     found = detect_anomalies(
         series,
@@ -30,7 +32,7 @@ def _run(data: dict) -> dict:
     }
 
 
-def handler(event: dict, context: object) -> dict:
+def handler(event: dict[str, Any], context: object) -> dict[str, Any]:
     try:
         return run_stage(event, required=["series"], fn=_run)
     except ForecastError as exc:
