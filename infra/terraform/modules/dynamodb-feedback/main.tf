@@ -7,7 +7,7 @@ terraform {
 
 variable "table_name" { type = string }
 variable "common_tags" {
-  type = map(string)
+  type    = map(string)
   default = {}
 }
 

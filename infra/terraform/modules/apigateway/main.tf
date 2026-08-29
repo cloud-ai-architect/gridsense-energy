@@ -84,7 +84,7 @@ resource "aws_lambda_permission" "this" {
   source_arn    = "${aws_apigatewayv2_api.this.execution_arn}/*/*"
 }
 
-output "api_id"     { value = aws_apigatewayv2_api.this.id }
-output "api_url"    { value = aws_apigatewayv2_api.this.api_endpoint }
+output "api_id" { value = aws_apigatewayv2_api.this.id }
+output "api_url" { value = aws_apigatewayv2_api.this.api_endpoint }
 output "stage_name" { value = aws_apigatewayv2_stage.this.name }
-output "routes"     { value = [for k, _ in var.routes : "POST /v1/${k}"] }
+output "routes" { value = [for k, _ in var.routes : "POST /v1/${k}"] }

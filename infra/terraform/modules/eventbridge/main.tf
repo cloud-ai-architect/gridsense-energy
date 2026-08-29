@@ -9,7 +9,7 @@ variable "name_prefix" { type = string }
 variable "bucket_name" { type = string }
 variable "state_machine_arn" { type = string }
 variable "common_tags" {
-  type = map(string)
+  type    = map(string)
   default = {}
 }
 
@@ -32,9 +32,9 @@ resource "aws_iam_role" "this" {
 
 data "aws_iam_policy_document" "this" {
   statement {
-    sid     = "StartStateMachine"
-    effect  = "Allow"
-    actions = ["states:StartExecution"]
+    sid       = "StartStateMachine"
+    effect    = "Allow"
+    actions   = ["states:StartExecution"]
     resources = [var.state_machine_arn]
   }
 }
@@ -66,5 +66,5 @@ resource "aws_cloudwatch_event_target" "this" {
   role_arn = aws_iam_role.this.arn
 }
 
-output "rule_arn"  { value = aws_cloudwatch_event_rule.this.arn }
+output "rule_arn" { value = aws_cloudwatch_event_rule.this.arn }
 output "rule_name" { value = aws_cloudwatch_event_rule.this.name }

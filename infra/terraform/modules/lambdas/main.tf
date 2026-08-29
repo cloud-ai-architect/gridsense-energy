@@ -1,9 +1,9 @@
 terraform {
   required_version = ">= 1.9.0"
   required_providers {
-    aws     = { source = "hashicorp/aws",     version = "~> 5.50" }
+    aws     = { source = "hashicorp/aws", version = "~> 5.50" }
     archive = { source = "hashicorp/archive", version = "~> 2.4" }
-    random  = { source = "hashicorp/random",  version = "~> 3.6" }
+    random  = { source = "hashicorp/random", version = "~> 3.6" }
   }
 }
 
@@ -12,15 +12,15 @@ variable "environment" { type = string }
 variable "name_prefix" { type = string }
 variable "lambdas" { type = map(string) }
 variable "lambda_runtime" {
-  type = string
+  type    = string
   default = "python3.12"
 }
 variable "lambda_memory_mb" {
-  type = number
+  type    = number
   default = 512
 }
 variable "lambda_timeout" {
-  type = number
+  type    = number
   default = 300
 }
 variable "buckets" { type = map(string) }
@@ -31,11 +31,11 @@ variable "haiku_model_id" { type = string }
 variable "lambda_role_arns" { type = map(string) }
 variable "api_role_arns" { type = map(string) }
 variable "log_retention_days" {
-  type = number
+  type    = number
   default = 30
 }
 variable "common_tags" {
-  type = map(string)
+  type    = map(string)
   default = {}
 }
 
@@ -110,7 +110,7 @@ resource "aws_lambda_function" "this" {
 }
 
 resource "aws_cloudwatch_log_group" "this" {
-  for_each = var.lambdas
+  for_each          = var.lambdas
   name              = "/aws/lambda/${each.value}"
   retention_in_days = var.log_retention_days
   tags              = var.common_tags
