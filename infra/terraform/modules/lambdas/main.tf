@@ -56,10 +56,10 @@ locals {
 
   stage_lambdas = {
     orchestrator = "src.lambdas.orchestrator_handler.handler"
-    sales        = "src.lambdas.sales_handler.handler"
-    support      = "src.lambdas.support_handler.handler"
-    returns      = "src.lambdas.returns_handler.handler"
-    search       = "src.lambdas.search_handler.handler"
+    forecast     = "src.lambdas.forecast_handler.handler"
+    anomaly      = "src.lambdas.anomaly_handler.handler"
+    dispatch     = "src.lambdas.dispatch_handler.handler"
+    explain      = "src.lambdas.explain_handler.handler"
     feedback     = "src.lambdas.feedback_handler.handler"
   }
 }
@@ -98,6 +98,14 @@ resource "aws_lambda_function" "this" {
 
   tracing_config {
     mode = "Active"
+  }
+
+  # Terraform provisions the function; application code is delivered by
+  # scripts/package_lambdas.py via update-function-code. Without this, every
+  # apply reverts the live code to the 248-byte placeholder stub -- which is
+  # exactly what happened when the API routes were rewired.
+  lifecycle {
+    ignore_changes = [filename, source_code_hash]
   }
 }
 

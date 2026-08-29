@@ -1,10 +1,10 @@
 variable "project_name" { type = string }
 variable "environment" { type = string }
 variable "name_prefix" { type = string }
+variable "github_subs" { type = list(string) }
+
 variable "github_org" { type = string }
 variable "github_repo" { type = string }
-variable "github_sub_main" { type = string }
-variable "github_sub_pr" { type = string }
 variable "github_aud" { type = string }
 variable "github_thumbprint" { type = string }
 variable "buckets" { type = map(string) }

@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "github_trust" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = [var.github_sub_main, var.github_sub_pr]
+      values   = var.github_subs
     }
   }
 }
@@ -42,17 +42,126 @@ resource "aws_iam_role" "github_actions" {
 }
 
 data "aws_iam_policy_document" "github_actions_inline" {
+  # Terraform state backend, addressed by ARN.
+  #
+  # This cannot be tag-conditioned. The state bucket is created by the
+  # bootstrap script rather than by Terraform, so it carries no Project tag,
+  # and S3 does not surface tags to IAM for HeadObject in any case. The
+  # previous policy allowed only tag-matched resources, so `terraform init`
+  # failed with 403 Forbidden when reading the state object.
   statement {
-    sid     = "AllActionsOnRetailPulse"
-    effect  = "Allow"
-    actions = ["*"]
-    resources = ["*"]
+    sid    = "TerraformStateBackend"
+    effect = "Allow"
 
-    condition {
-      test     = "StringEquals"
-      variable = "aws:ResourceTag/Project"
-      values   = [var.project_name]
-    }
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketVersioning",
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.project_name}-tfstate-${var.environment}",
+      "arn:aws:s3:::${var.project_name}-tfstate-${var.environment}/*",
+    ]
+  }
+
+  statement {
+    sid    = "TerraformStateLock"
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem",
+      "dynamodb:DescribeTable",
+    ]
+
+    resources = [
+      "arn:aws:dynamodb:*:*:table/${var.project_name}-tfstate-lock-${var.environment}",
+    ]
+  }
+
+  # IAM is confined to this project's own roles and policies. The deploy role
+  # can manage the roles this stack creates and nothing else -- notably it
+  # cannot touch its own trust policy or any unrelated principal.
+  statement {
+    sid    = "ProjectScopedIam"
+    effect = "Allow"
+
+    actions = [
+      "iam:GetRole",
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:UpdateRole",
+      "iam:TagRole",
+      "iam:UntagRole",
+      "iam:ListRolePolicies",
+      "iam:ListAttachedRolePolicies",
+      "iam:GetRolePolicy",
+      "iam:PutRolePolicy",
+      "iam:DeleteRolePolicy",
+      "iam:AttachRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:PassRole",
+    ]
+
+    resources = [
+      "arn:aws:iam::*:role/${var.name_prefix}-*",
+    ]
+  }
+
+  # The GitHub OIDC provider is account-wide and shared by every project, so
+  # it cannot be name-scoped. Terraform reads it on each apply to resolve the
+  # federated principal; without this, apply fails on
+  # GetOpenIDConnectProvider. Create/Delete are deliberately excluded -- the
+  # provider is bootstrapped once and a deploy role has no business removing
+  # it out from under the other stacks.
+  statement {
+    sid    = "ReadSharedOidcProvider"
+    effect = "Allow"
+
+    actions = [
+      "iam:GetOpenIDConnectProvider",
+      "iam:ListOpenIDConnectProviders",
+    ]
+
+    resources = [
+      "arn:aws:iam::*:oidc-provider/token.actions.githubusercontent.com",
+    ]
+  }
+
+  # Deploy permissions for the services this stack uses.
+  #
+  # Scoped by service rather than by resource: Terraform must create
+  # resources that do not exist yet, so they can be matched by neither ARN
+  # nor tag, and API Gateway, CloudFront and KMS address resources by
+  # generated ID. Enumerating services keeps this materially narrower than
+  # Action "*" while remaining workable for a deploy role.
+  statement {
+    sid    = "DeployProjectServices"
+    effect = "Allow"
+
+    actions = [
+      "lambda:*",
+      "s3:*",
+      "s3vectors:*",
+      "dynamodb:*",
+      "apigateway:*",
+      "states:*",
+      "events:*",
+      "cloudfront:*",
+      "kms:*",
+      "logs:*",
+      "resource-groups:*",
+      "tag:GetResources",
+      "tag:TagResources",
+      "tag:UntagResources",
+      "sts:GetCallerIdentity",
+    ]
+
+    resources = ["*"]
   }
 }
 
@@ -110,9 +219,19 @@ data "aws_iam_policy_document" "lambda_bedrock" {
     actions = [
       "bedrock:InvokeModel",
       "bedrock:InvokeModelWithResponseStream",
+      "bedrock:Converse",
+      "bedrock:ConverseStream",
     ]
 
+    # Calls go through cross-region inference profiles (apac.*, global.*),
+    # which are a distinct resource type from the foundation model itself --
+    # and authorisation requires BOTH: the profile that is invoked, and the
+    # models it routes to. Foundation-model ARNs also carry no account id,
+    # hence the empty account segment.
     resources = [
+      "arn:aws:bedrock:*:*:inference-profile/*",
+      "arn:aws:bedrock:*:*:application-inference-profile/*",
+      "arn:aws:bedrock:*::foundation-model/*",
       "arn:aws:bedrock:*:*:foundation-model/*",
     ]
   }
