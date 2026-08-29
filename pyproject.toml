@@ -27,6 +27,12 @@ dev = [
   "pre-commit>=3.7.0",
 ]
 
+[tool.hatch.build.targets.wheel]
+# Hatchling cannot infer the package: the distribution is named after the
+# project but the code lives in src/, so an editable install fails with
+# "Unable to determine which files to ship inside the wheel".
+packages = ["src"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"
@@ -39,7 +45,7 @@ ignore = ["E501"]
 # Tests assert; that is what they are for.
 # ARG001: pytest fixtures are passed by name and often unused in the body.
 # PLC0415: imports inside a test keep an optional dependency scoped to it.
-"tests/**" = ["S101", "ARG001", "PLC0415"]
+"tests/**" = ["S101", "ARG", "PLC0415"]
 
 # Lambda handlers take (event, context) to satisfy the runtime contract even
 # when context is unused, and import boto3 lazily to keep cold starts short.
